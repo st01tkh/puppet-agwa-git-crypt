@@ -4,14 +4,16 @@
   "author": "st01tkh",
   "summary": "Setup AGWA git-crypt",
   "license": "Apache Version 2.0",
-  "source": "https://github.com/st01tkh/puppet-st01tkh-agwa-git-crypt",
-  "project_page": "https://github.com/st01tkh/puppet-st01tkh-agwa-git-crypt",
-  "issues_url": "https://github.com/st01tkh/puppet-st01tkh-agwa-git-crypt",
+  "source": "https://github.com/st01tkh/puppet-agwa-git-crypt",
+  "project_page": "https://github.com/st01tkh/puppet-agwa-git-crypt",
+  "issues_url": "https://github.com/st01tkh/puppet-agwa-git-crypt",
   "description": "AGWA git-crypt",
   "dependencies": [
     {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"},
     {"name":"puppetlabs-git","version_requirement":">= 0.4.0"},
     {"name":"puppetlabs-apt","version_requirement":">= 2.2.0"},
-    {"name":"chocolatey-chocolatey","version_requirement":">= 1.2.0"}
+    {"name":"chocolatey-chocolatey","version_requirement":">= 1.2.0"},
+    {"name":"puppetlabs-vcsrepo","version_requirement":">= 1.2.3"}
+    {"name":"st01tkh-mingw","version_requirement":">= 0.1.0"}
   ]
 }

@@ -1,22 +1,4 @@
-# == Class: agwa-git-crypt
-#
-# AGWA git-crypt
-#
-# === Parameters
-#
-# === Variables
-#
-# === Examples
-#
-# === Authors
-#
-# st01tkh <st01tkh@gmail.com>
-#
-# === Copyright
-#
-# Copyright 2016 Your name here, unless otherwise noted.
-#
-class agwa-git-crypt {
+class agwa-git-crypt::build {
   case $operatingsystem {
     'Solaris':          {
       notify {'No action for Solaris yet':}
@@ -43,15 +25,12 @@ class agwa-git-crypt {
     'windows': {
       Package { provider => chocolatey, }
       include chocolatey
-      include mingw
-
-      class {'agwa-git-crypt::build':
-      }
+      class {'agwa-git-crypt::deps': }
 
       $tmp_dir = 'c:\temp'
       $tmp_base = 'agwa-git-crypt.123'
       $tmp_path = file_join_win(["${tmp_dir}", "${tmp_base}"])
-
+      
       $sysroot = env("SYSTEMROOT")
       $sys32 = file_join_win(["${sysroot}", "System32"])
 
@@ -66,16 +45,32 @@ class agwa-git-crypt {
       $choco_dir = env("ChocolateyInstall")
       $choco_bin = file_join_win(["${choco_dir}", "bin"])
 
-
-      $git_crypt_exe_dst_path = file_join_win(["${mingw_bin}", "git-crypt.exe"])
-      $git_crypt_exe_src_path = file_join_win(["${tmp_path}", "git-crypt.exe"])
-
-      file {"${git_crypt_exe_dst_path}":
-        require => Class['agwa-git-crypt::build'],
-        source_permissions => ignore,
-        ensure => present,
-        mode => 0755,
-        source =>  "${git_crypt_exe_src_path}",
+      $msys_ssl_inc = file_join_win(["${msys_dir}", "include", "openssl"])
+      $mingw_ssl_inc = file_join_win(["${mingw_dir}", "include", "openssl"])
+      notify {"msys_ssl_inc: ${msys_ssl_inc} mingw_ssl_inc: ${mingw_ssl_inc}": }
+      file {"${mingw_ssl_inc}":
+        require => [
+          Class['agwa-git-crypt::deps'],
+        ],
+        ensure => 'link',
+        target => "${msys_ssl_inc}",
+      }
+      #file { "ensure_${tmp_dir}":
+      #  ensure => directory
+      #}
+      vcsrepo { "${$tmp_path}":
+        #require => [File["ensure_${tmp_dir}"]],
+        ensure   => present,
+        provider => git,
+        source => 'https://github.com/AGWA/git-crypt',
+      }
+      $msys_lib = file_join_win(["${msys_dir}", "lib"])
+      $mingw_lib = file_join_win(["${mingw_dir}", "lib"])
+      exec {"make_git-crypt": 
+        path => [$sysroot, $sys32, $mingw_bin, $msys_bin],
+        cwd => "${tmp_path}",
+        environment => ["LIBRARY_PATH=${msys_lib};${mingw_lib}"],
+        command => "make"
       }
     }
     default: {
